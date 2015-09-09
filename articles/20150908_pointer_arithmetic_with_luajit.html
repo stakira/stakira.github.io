@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<title>Three Fine Days</title>
+
+<xmp style="display:none;">
+# Pointer Arithmetic with LuaJIT
+
+Lua is designed to be simple. This 'simple' has many meanings. It's a language with only a handful of features but still very expressive. Its features can be implemented efficiently. It works with C easily.
+
+LuaJIT takes the last one even further, by introducing a FFI which feels like cheating.
+
+So pointer arithmetic with LuaJIT is pretty simple:
+
+    local array = ffi.new('int[?]', size)
+    local array_ptr = ffi.cast('int*', array)
+    local array_ptr = array_ptr + 1
+    print(array_ptr[0])
+
+Note here `'int[?]'` here is a type called VLA (variable length array), which is one of the `ctype`s of LuaJIT FFI. `'int*'` is a different type. You can cast a VLA to a pointer using `ffi.cast`. Then pointer arithmetic is pretty straight forward. This pointer can still be used with `[]` indexing, just like in C.
+
+And below is an example, which I actually use, and is originally a cool trick in C.
+
+    function bytematrix(w, h)
+        local data = ffi.new('unsigned char [?]', w * h)
+        local data_ptr = ffi.cast('unsigned char*', data)
+        local mat = ffi.new('unsigned char *[?]', w)
+        for i = 0, w - 1 do
+            mat[i] = data_ptr + i * h
+        end
+        return data, mat
+    end
+
+This function will create a byte 2d array of width `w` and height `h`. `data` is a 1d array which holds the actual data in a continuous space of memory. `mat` is the pointer can be indexed intuitively, in the form of `mat[x][y]`. Note that you need to keep the reference of `data` to avoid garbage collection.
+
+Indexing out of range is still unsafe, and may not give out any error information. So be careful.
+
+It seems to be (less than 2x) slower than its equivalent in C. So pushing it into a C library through FFI is a good idea if necessary. I have a C library version in a [gist](https://gist.github.com/stakira/26c4323e3d78ab01aeb7).
+
+</xmp>
+
+<script src="../js/strapdown-v0.2/strapdown.js"></script>
+</html>
