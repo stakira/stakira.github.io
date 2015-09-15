@@ -1,58 +1,59 @@
-<!doctype html>
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="Content-Language" content="zh-CN" />
-	<title>Sugita Akira's Site</title>
-	<link rel="shortcut icon" href="image/favicon.png" />
-	
-	<!-- CSS -->
-	<link rel="stylesheet" href="css/style.css">
-	<!-- end CSS -->
-	
-	<!-- JS -->
-	<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
-	<script type="text/javascript" src="http://stratus.sc/stratus.js"></script>
-	<script type='text/javascript'>
-	  $(document).ready(function(){
-		$.stratus({
-		  links: 'http://soundcloud.com/stakira',
-		  download: false,
-		  align:"bottom",
-		  position:"fixed",
-		  color:"66CCFF",
-		  theme:"http://stratus.sc/themes/dark.css",
-		  volume:100
-		});
-	  });
-	</script>
-	<!-- end JS -->
+	<title>Three Fine Days</title>
+	<link type="text/css" rel="stylesheet" href="./css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" href="./css/threefinedays.css">
+	<style>
+		html {
+			background:url(./image/desk.jpg) no-repeat center center fixed;
+			background-size: cover;
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+		}
+		body {
+			background-color: transparent;
+		}
+		.dark {
+			background-color: #333333;
+			color: #f0f0f0;
+		}
+		.verticalcenter {
+			position: relative;
+			position: absolute;
+			bottom: 0;
+			/*top: 50%;*/
+			/*transform: translateY(-50%);*/
+		}
+	</style>
 </head>
-
-<body style=''>
-	<div id="container">
-		<div id="socialbox">
-        	<a href="http://3finedays.lofter.com/" target="_blank" alt="ÈýÌìµÄÇçÀÊ"><div class="socialicon lofter">
-            	<img src="image/lofter.png" alt="lofter" height="128" width="128" border="0">
-				<div class="hover"></div>
-            </div></a>
-            
-            <a href="https://soundcloud.com/stakira" target="_blank" alt="SoundCloud"><div class="socialicon soundcloud">
-            	<img src="image/soundcloud.png" alt="soundcloud" height="128" width="128" border="0">
-				<div class="hover"></div>
-            </div></a>
-            
-            <a href="http://www.weibo.com/sugitaakira" target="_blank" alt="ÐÂÀËÎ¢²©"><div class="socialicon weibo">
-            	<img src="image/weibo.png" alt="weibo" height="128" width="128" border="0">
-				<div class="hover"></div>
-            </div></a>
-            
-            <a href="http://www.bilibili.tv/mylist53663" target="_blank" alt="ßÙÁ¨ßÙÁ¨"><div class="socialicon bilibili">
-            	<img src="image/bilibili.png" alt="bilibili" height="128" width="128" border="0">
-				<div class="hover"></div>
-            </div></a>
+<body>
+	<nav class="navbar navbar-default navbar-static-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Three Fine Days</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="./blog.html">Blog</a></li>
+					<li><a href="./music.html">Music</a></li>
+					<li><a href="./graphics.html">Graphics</a></li>
+					<li><a href="./about.html">About</a></li>
+				</ul>
+				<ul class="nav navbar-nav pull-right">
+					<li><a target="_blank" href="http://weibo.com/sugitaakira">Weibo</a></li>
+					<li><a target="_blank" href="https://github.com/stakira">Github</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="jumbotron dark">
+			<h1>Three Fine Days</h1>
+			<p>Lingfeng Xu</p>
 		</div>
 	</div>
+
 </body>
 </html>

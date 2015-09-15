@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
-<title>Three Fine Days</title>
+<head>
+    <script type="text/javascript" src="../js/l.min.js">ljs.load('../js/blog.js');</script>
+</head>
 
-<xmp style="display:none;">
+<pre style="display:none;">
 # Pointer Arithmetic with LuaJIT
 
 Lua is designed to be simple. This 'simple' has many meanings. It's a language with only a handful of features but still very expressive. Its features can be implemented efficiently. It works with C easily.
@@ -30,13 +32,11 @@ And below is an example, which I actually use, and is originally a cool trick in
         return data, mat
     end
 
-This function will create a byte 2d array of width `w` and height `h`. `data` is a 1d array which holds the actual data in a continuous space of memory. `mat` is the pointer can be indexed intuitively, in the form of `mat[x][y]`. Note that you need to keep the reference of `data` to avoid garbage collection.
+This function creates a byte 2d array of width `w` and height `h`. `data` is a 1d array which holds the actual data in a continuous space of memory. `mat` is the pointer can be indexed intuitively, in the form of `mat[x][y]`. Note that you need to keep the reference of `data` to avoid garbage collection.
 
 Indexing out of range is still unsafe, and may not give out any error information. So be careful.
 
 It seems to be (less than 2x) slower than its equivalent in C. So pushing it into a C library through FFI is a good idea if necessary. I have a C library version in a [gist](https://gist.github.com/stakira/26c4323e3d78ab01aeb7).
+</pre>
 
-</xmp>
-
-<script src="../js/strapdown-v0.2/strapdown.js"></script>
 </html>
