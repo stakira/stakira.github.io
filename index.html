@@ -13,23 +13,26 @@
 			-o-background-size: cover;
 		}
 		body {
+			height: 90%;
 			background-color: transparent;
 		}
 		.dark {
 			background-color: #333333;
 			color: #f0f0f0;
 		}
-		.verticalcenter {
+		.fullheight {
+			padding-bottom: 0;
+			height: 100%;
+		}
+		.vcenter {
 			position: relative;
-			position: absolute;
-			bottom: 0;
-			/*top: 50%;*/
-			/*transform: translateY(-50%);*/
+			top: 50%;
+			transform: translateY(-50%);
 		}
 	</style>
 </head>
 <body>
-	<nav class="navbar navbar-default navbar-static-top">
+	<nav class="navbar navbar-default navbar-static-top" style="margin:0;">
 		<div class="container">
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#">Three Fine Days</a>
@@ -48,8 +51,8 @@
 			</div>
 		</div>
 	</nav>
-	<div class="container">
-		<div class="jumbotron dark">
+	<div class="container fullheight">
+		<div class="jumbotron dark vcenter">
 			<h1>Three Fine Days</h1>
 			<p>Lingfeng Xu</p>
 		</div>
