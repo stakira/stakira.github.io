@@ -53,10 +53,10 @@ footer p {
 
 /* --- Typography --- */
 body {
-	font-family: "Ubuntu";
+	font-family: Verdana, Geneva, Arial, sans-serif;;
 }
 .article p {
-	font-size: 16px;
+	font-size: 15.4px;
 }
 h1, h2, h3, h4, h5, h6 {
 	font-family: "Ubuntu";
@@ -71,11 +71,6 @@ h1 {
 h2 {
 	font-weight: normal;
 }
-code {
-	color: #333333;
-	background-color: #f5f5f5;
-	font-family: "Consolas", "Menlo", "Monaco", monospace, serif;
-}
 
 /* --- Article list --- */
 .article-list {
@@ -83,6 +78,7 @@ code {
 	padding: 0;
 	margin-left: -15px;
 	background-color: #f5f5f5;
+	border-radius: 4px;
 }
 
 .article-list>a>li {

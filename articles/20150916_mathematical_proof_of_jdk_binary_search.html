@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="../js/l.min.js">ljs.load('../js/blog.js');</script>
+</head>
+<xmp style="display:none;">
+# Mathematical Proof Of JDK Binary Search
+
+In JDK, an interesting implementation of binary search is provided. I'm talking about `Arrays.binarySearch` here. The particular clever part is the return value:
+
+> Returns:
+>
+> index of the search key, if it is contained in the array; otherwise, (-(insertion point) - 1). The insertion point is defined as the point at which the key would be inserted into the array: the index of the first element greater than the key, or a.length if all elements in the array are less than the specified key. Note that this guarantees that the return value will be >= 0 if and only if the key is found.
+
+It's super clear to see we have a insertion point or the actual number is found. I find it a bit unintuitive how `low` is guaranteed to be insertion point. So I'm writing this blog to try to prove it, mostly for my own understanding and record.
+
+The source code below can be found in `src/share/classes/java/util/Arrays.java`.
+
+    private static int binarySearch0(int[] a, int fromIndex, int toIndex, int key) {
+        int low = fromIndex;
+        int high = toIndex - 1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            int midVal = a[mid];
+
+            if (midVal < key)
+                low = mid + 1;
+            else if (midVal > key)
+                high = mid - 1;
+            else
+                return mid; // key found
+        }
+        return -(low + 1);  // key not found.
+    }
+
+Of course, this kind of proof calls for induction.
+
+- **Base case 0**: Array of zero elements, which is allowed by Java. Since `low=0` and `high=-1`, it doesn't even go into to the loop. Fucntion immediately exit with `low=0`, which is the correct insertion point.
+
+- **Base case 1**: Array of one elements. It may be the target, or not. The search start with `low=0` and `high=0`. Then `mid=0`. If `midVal` is the target, the algorithm is obviously correct. If it is smaller than target, we return with `low=1`, which is the correct insertion point. If it is larger than target, we return with `low=0`, which is again correct. Proved.
+
+- **Inductive step**: Assuming algorithm is correct for array of length less than or equal to `n` where `n>1`. For an array of length `n+1`, we start with `low=0` and `high=n`. If `n` is odd, `mid=(n-1)/2`, otherwise `mid=n/2`. If target is found in this loop, the algorithm is obviously correct. In the next loop, there are four cases. If `n` is odd, `low=(n-1)/2+1,high=n` or `low=0,high=(n-1)/2`. If `n` is even, `low=n/2+1,high=n` or `low=0,high=n/2-1`. In these cases, the new length well be `(n-1)/2` if `n` is odd, or `n/2-1` if `n` is even. Either way, the new length is guaranteed to be an integer larger than or equal to 0, and strictly smaller than `n`. So the next loop (recursion) should find the correct result **if and only if the result is in the subarray**. How is that guaranteed? It obvious if the target is actually in the array. If it's not, the correct insertion point is still inside or at one end of the subarray. Therefore, proved.
+
+Note how we start with `n>1` in the inductive step, and why we need the base case of `n=0`. It's due to the nature of binary search having to deal with odd and even length arrays differently. It does feel a bit wierd. We can actually make `n=1` and `n=2` the base cases for a language that does not allow zero length arrays, and get the same proof.
+
+Another thing need to be noticed, is that the induction proof strictly should be applied on recursion. This code is presented as iterative, but I believe you can see how it could be translated to recursive.
+
+Even though the inductive steps takes longer to prove, the real corner cases are in the base cases. We got them correct, we got the whole thing correct.
+
+</xmp>
+</html>

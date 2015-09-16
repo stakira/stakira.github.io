@@ -41,11 +41,11 @@ function loadPage() {
 	function createArticle() {
 		var node = document.createElement('DIV');
 		node.setAttribute("class", "container article")
-		var text = document.getElementsByTagName("pre")[0];
+		var text = document.getElementsByTagName("xmp")[0];
 		text.parentElement.removeChild(text);
 		node.innerHTML = marked(text.innerHTML, {
-			highlight: function (code) {
-				return hljs.highlightAuto(code, ['lua']).value;
+			highlight: function (code, lang, callback) {
+				return hljs.highlightAuto(code, lang ? [lang] : null).value;
 			},
 			gfm: true
 		});
