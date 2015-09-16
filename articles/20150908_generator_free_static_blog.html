@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="../js/l.min.js">ljs.load('../js/blog.js');</script>
+</head>
+
+<pre style="display:none;">
+# Generator-Free Static Blog
+
+Ok. Eventually, my blog is up.
+
+It took quite some back and forth, before I find a solution than I can like. The last time I looked, there are also a overwhelming number of static site generator out there. However, I found they often use a markup language to create templates. I don't like this practise at all. The purpose of using a generators is to make it simple. The new language basically defeats it. Not only learning the new language takes effort, also all the templates and config files make the flow even more scattered (where the web development itself already is).
+
+Rrecently I found <a href="http://strapdownjs.com" target="_blank">strapdown.js</a>, which is basically a script which use <a href="https://github.com/chjj/marked" target="_blank">marked.js</a> to parse markdown in your html, and load bootstrap css for you. This was exciting. Also this method is search engine friendly, since all the content are in html, parsed or not. However I find that strapdown.js is outdated and use a very old version of bootstrap, also has limited feature. Fortunately, the mechanism is very simple, and can be implemented simpler. So I rolled my own, which also creates navbar and footer for me.
+
+Besides marked.js, I also used <a href="https://highlightjs.org/" target="_blank">highlight.js</a> and <a href="http://malko.github.io/l.js/" target="_blank">l.js</a>. You probably already know the first one, and l.js basically is a js/css loader. With its help, I can minimize the overhead in each blog article's html file. Eventually it's one line of javascript and one pre element for markdown.
+
+Now I still have to create the article list page, which is basically a list of titles and links. I couldn't find a static, generator-free, and search engine friendly way to do this. There is probably no such way. It is also not like a typical blog, which usually has multiple articles on the first page. But I'm OK with all these at the moment.
+
+So if you like static sites, and find generators tedious, you may wanna give try something similar to what I have done.
+</pre>
+
+</html>

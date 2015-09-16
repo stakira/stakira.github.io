@@ -15,9 +15,9 @@ function loadPage() {
 			'    <div id="navbar" class="navbar-collapse collapse">' +
 			'        <ul class="nav navbar-nav">' +
 			'            <li><a href="../blog.html">Blog</a></li>' +
-			'            <li><a href="./music.html">Music</a></li>' +
-			'            <li><a href="./graphics.html">Graphics</a></li>' +
-			'            <li><a href="./about.html">About</a></li>' +
+			'            <li><a href="../music.html">Music</a></li>' +
+			'            <li><a href="../graphics.html">Graphics</a></li>' +
+			'            <li><a href="../about.html">About</a></li>' +
 			'        </ul>' +
 			'        <ul class="nav navbar-nav pull-right">' +
 			'            <li><a target="_blank" href="http://weibo.com/sugitaakira">Weibo</a></li>' +
@@ -46,7 +46,8 @@ function loadPage() {
 		node.innerHTML = marked(text.innerHTML, {
 			highlight: function (code) {
 				return hljs.highlightAuto(code, ['lua']).value;
-			}
+			},
+			gfm: true
 		});
 		document.body.appendChild(node);
 	}
