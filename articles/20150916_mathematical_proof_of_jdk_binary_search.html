@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Mathematical Proof Of JDK Binary Search</title>
+    <meta name="description" content="Three Fine Days - Lingfeng Xu (stakira) - Blog">
     <script type="text/javascript" src="../js/l.min.js">ljs.load('../js/blog.js');</script>
 </head>
 <xmp style="display:none;">
@@ -40,13 +42,47 @@ Of course, this kind of proof calls for induction.
 
 - **Base case 1**: Array of one elements. It may be the target, or not. The search start with `low=0` and `high=0`. Then `mid=0`. If `midVal` is the target, the algorithm is obviously correct. If it is smaller than target, we return with `low=1`, which is the correct insertion point. If it is larger than target, we return with `low=0`, which is again correct. Proved.
 
-- **Inductive step**: Assuming algorithm is correct for array of length less than or equal to `n` where `n>1`. For an array of length `n+1`, we start with `low=0` and `high=n`. If `n` is odd, `mid=(n-1)/2`, otherwise `mid=n/2`. If target is found in this loop, the algorithm is obviously correct. In the next loop, there are four cases. If `n` is odd, `low=(n-1)/2+1,high=n` or `low=0,high=(n-1)/2`. If `n` is even, `low=n/2+1,high=n` or `low=0,high=n/2-1`. In these cases, the new length well be `(n-1)/2` if `n` is odd, or `n/2-1` if `n` is even. Either way, the new length is guaranteed to be an integer larger than or equal to 0, and strictly smaller than `n`. So the next loop (recursion) should find the correct result **if and only if the result is in the subarray**. How is that guaranteed? It obvious if the target is actually in the array. If it's not, the correct insertion point is still inside or at one end of the subarray. Therefore, proved.
+- **Inductive step**: Assuming algorithm is correct for array of length less than or equal to `n` where `n>=1`. For an array of length `n+1`, we start with `low=0` and `high=n`. If `n` is odd, `mid=(n-1)/2`, otherwise `mid=n/2`. If target is found in this loop, the algorithm is obviously correct. In the next loop, there are four cases. If `n` is odd, `low=(n-1)/2+1,high=n` or `low=0,high=(n-1)/2-1`. If `n` is even, `low=n/2+1,high=n` or `low=0,high=n/2-1`. In these cases, the new length well be `(n+1)/2` or `(n-1)/2` if `n` is odd, or `n/2` if `n` is even. Either way, the new length is guaranteed to be an integer larger than or equal to 0, and smaller than or equal to `n`. So the next loop (recursion) should find the correct result **if and only if the result is in the subarray**. How is that guaranteed? It's obvious if the target is actually in the array. If it's not, the correct insertion point is still inside or at one end of the subarray. Therefore, proved.
 
-Note how we start with `n>1` in the inductive step, and why we need the base case of `n=0`. It's due to the nature of binary search having to deal with odd and even length arrays differently. It does feel a bit wierd. We can actually make `n=1` and `n=2` the base cases for a language that does not allow zero length arrays, and get the same proof.
+Note how we start with `n>=1` in the inductive step, or length 2, and why we need the base case of `n=0`. It's due to the nature of binary search having to deal with odd and even length arrays differently. It does feel a bit wierd. We can actually make `n=1` and `n=2` the base cases for a language that does not allow zero length arrays, and get the same proof.
 
-Another thing need to be noticed, is that the induction proof strictly should be applied on recursion. This code is presented as iterative, but I believe you can see how it could be translated to recursive.
+Another thing is, the induction proof applies on recursion. This code is presented as iterative, but I believe you can see how it could be translated to recursive.
 
-Even though the inductive steps takes longer to prove, the real corner cases are in the base cases. We got them correct, we got the whole thing correct.
+There is another things I noticed. First, as long as `low` and `high` are not equal, `mid` is never `high`, but can be `low`. This means in each recursion, `high = mid` will work for loop condition `low < high`, but `low = mid` will cause dead loop. If loop condition is `low <= high`, even `high = mid` could end up with dead loops. Down sizing must be guaranteed in each recursion.
 
+If we opt `low < high` as loop condition, and `low = mid + 1` and `high = mid` in each loop, the search could still be done, like this:
+
+    private static int binarySearch0(int[] a, int fromIndex, int toIndex, int key) {
+        int low = fromIndex;
+        int high = toIndex - 1;
+
+        while (low < high) {
+            int mid = (low + high) >>> 1;
+            int midVal = a[mid];
+
+            if (midVal < key)
+                low = mid + 1;
+            else
+                high = mid;
+        }
+        return low;
+    }
+
+However, there can not be an indication of found or not, unless you test it afterwards. Since termination condition is `low < high`, the equal test could be skipped. We will have to look at `low` value, it works correctly, but only when the target is in the array. Use it as the insertion point is not reliable. So this works best when you know the target exist.
+
+The benefits? The returned index never goes out of bound. It doesn't need a return in loop. It's a safer play, especially when you are searching something other than the value. For example, in a rotated sorted array, something like [4, 5, 6, 1, 2, 3], you can use this to find the rotation point.
+
+    int low = 0, high = a.length - 1;
+    while (low < high) {
+        int mid = (low + high) / 2;
+
+        if (a[mid] > a[high])
+            low = mid + 1;
+        else
+            high = mid;
+    }
+    int rotated = low;
+
+`low` will point to the smallest number. This is hard to get right using `high = mid - 1`, since `high` could be moved to the maximum value, which overshoots.
 </xmp>
 </html>

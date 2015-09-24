@@ -1,9 +1,5 @@
 
 function loadPage() {
-	function setTitle() {
-		document.title = "Three Fine Days";
-	}
-
 	function createNavbar() {
 		var node = document.createElement('NAV');
 		node.setAttribute("class", "navbar navbar-default navbar-static-top")
@@ -52,7 +48,6 @@ function loadPage() {
 		document.body.appendChild(node);
 	}
 
-	setTitle();
 	createNavbar();
 	createArticle();
 	createFooter();

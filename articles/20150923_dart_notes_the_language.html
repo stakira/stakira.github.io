@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dart Notes: The Language</title>
+    <meta name="description" content="Three Fine Days - Lingfeng Xu (stakira) - Blog">
+    <script type="text/javascript" src="../js/l.min.js">ljs.load('../js/blog.js');</script>
+</head>
+<xmp style="display:none;">
+# Dart Notes: The Language
+
+## Foreword
+
+This post is a shortened version of <a href="https://www.dartlang.org/docs/dart-up-and-running/ch02.html" target="_blank">official language tour</a>, mostly for my own quick reference, It is not a complete feature list, but may help see what's Dart like.
+
+Dart was designed as the next web language. Unfortunately Google doesn't want it in Chrome. I hope this language will not end up built around Javascript.
+
+In my opinion, the value of Dart is you can both be quick when you want, and be safe when you need. Type checking and proper class system are incredibly valuable. Using some fake class system to build even medium size project is just so painful.
+
+The rest, null-aware operators, method chaining, built-in list and map, async, are all nice features.
+
+It's dynamic. It has type checking during development. I can see bits of C++, Java, Javascript, Python and even C# in it. It borrows what is not broken and fixes what is broken. It's like a dream language.
+
+At the moment, the only things I hope it to add is coroutine. Not sure how isolate works yet.
+
+## Important concepts
+
+- Optional types in checked mode.
+- Prefix `_` properly hides stuff.
+
+## Variables
+
+- No matter what type, uninitialized variables are `null`.
+- It got `const` and it's compile time!
+- `final` is for lazyily initialized constants.
+
+## Built-in types
+
+- Everything is object.
+- `num` has `int` and `double` as subtype
+- Only `ture` is `true`, everything else, including primitives and objects, is `false`.
+- List and Map syntax similar to Python
+
+    ```dart
+var list = [1, 2, 3];
+var map = { 'a' : 1, 'b' : 2 };
+print(map['a']); // `.` reserved for member access
+    ```
+
+- Symbols: for reflection
+
+## Functions
+
+```dart
+f(bool a, {bool b: true, bool c}) // optional named parameters
+g(bool a, [bool b = true, bool c]) // optional positional parameters
+
+f(true, b:false);
+g(true, false, true);
+
+void printStr(str) => print("$str"); // return shorthand
+(str) { print("$str"); } // anonymous function
+(str) => print("$str"); // anonymous function and return shorthand
+
+main() {} // entry point. has optional `List<String>` parameter.
+```
+
+## Operators
+
+Pretty much like C++
+
+- Division and integer division: `/` and `~/`
+- Cascade operator: method chaining
+- Type cast: `as`
+- Type test: `is` `is!` (`is not`? Seems make some sense)
+
+Null aware operators
+
+- Assign if null: `??=` (Good!)
+- Returns lhs if it is non-null, otherwise rhs: `expr1 ?? expr2` (Yes!)
+- Conditional member access: `?.` (Access only if lhs is not null. Otherwise the expression itself is null)
+
+## Control flow statements
+- Foreach: `for (var x in collection) {}`
+- Case-switch falls through only when empty, otherwise needs ugly label.
+- Assert only works in checked mode: `assert(true)`
+
+## Exceptions
+
+- Can throw `Exception`, `Error` or arbitrary objects.
+- Try-catch-finally is somewhat complex.
+
+## Classes
+
+- Object-oriented with classes and mixin-based inheritance.
+- `this` seems to mean what it should.
+
+#### Null-aware member access
+
+```dart
+p?.y = 4; // avoid null pointer exception
+```
+
+#### Method chaining on any method
+
+```dart
+querySelector('#button') // Get an object.
+  ..text = 'Confirm'   // Use its members.
+  ..classes.add('important')
+  ..onClick.listen((e) => window.alert('Confirmed!'));
+```
+
+#### Named constructors
+
+```dart
+class Point {
+  /* ... */
+  Point(this.x, this.y); // shorthand constructor
+
+  // Named constructor
+  Point.fromJson(Map json) { /* ... */ }
+}
+
+var emp = new Point.fromJson({ 'x': 0, 'y': 0 });
+```
+
+#### Call super constructor
+
+```dart
+class Employee extends Person {
+  Employee.fromJson(Map data) : super.fromJson(data) { // call super
+    print('in Employee');
+  }
+}
+```
+
+#### Initializer list
+
+```dart
+class Point {
+  /* ... */
+  // Initializer list sets instance variables before constructor runs.
+  Point.fromJson(Map jsonMap)
+      : x = jsonMap['x'],
+        y = jsonMap['y'] {
+    print('In Point.fromJson(): ($x, $y)');
+  }
+}
+```
+
+#### Redirecting constructors
+
+```dart
+class Point {
+  /* ... */
+  // Delegates to the main constructor.
+  Point.alongXAxis(num x) : this(x, 0);
+}
+```
+
+#### Constant constructors
+
+```dart
+class ImmutablePoint {
+  final num x;
+  final num y;
+  const ImmutablePoint(this.x, this.y);
+  static final ImmutablePoint origin = const ImmutablePoint(0, 0); // static final here
+}
+```
+
+#### Factory constructors
+
+- Really? Language level?
+- Have no access to `this`.
+- More like just a static method.
+
+Example taking object from cache or creating new one.
+
+```dart
+class Logger {
+  final String name; // final, cannot change after object created
+  bool mute = false;
+
+  // _cache is library-private, thanks to the _ in front of its name.
+  static final Map<String, Logger> _cache = <String, Logger>{};
+
+  factory Logger(String name) {
+    if (_cache.containsKey(name)) { // this really is not Java?
+      return _cache[name]; // getting from cache
+    } else {
+      final logger = new Logger._internal(name); // creating new
+      _cache[name] = logger;
+      return logger;
+    }
+  }
+
+  Logger._internal(this.name); // named constructor
+
+  void log(String msg) { if (!mute) { print(msg); } }
+}
+
+var logger = new Logger('UI'); // use `new` to invoke factory constructor
+logger.log('Button clicked');
+```
+
+#### Getters and setters
+
+```dart
+class Rectangle {
+  /* ... */
+  // Define two calculated properties: right and bottom.
+  num get right             => left + width;
+      set right(num value)  => left = value - width;
+  num get bottom            => top + height;
+      set bottom(num value) => top = value - height;
+}
+```
+
+#### Operator Overriding
+
+```dart
+class Vector {
+  final int x;
+  final int y;
+  const Vector(this.x, this.y);
+  Vector operator +(Vector v) { return new Vector(x + v.x, y + v.y); }
+  Vector operator -(Vector v) { return new Vector(x - v.x, y - v.y); }
+}
+```
+
+#### Enumerated types
+
+```dart
+enum Color { red, green, blue }
+assert(Color.red.index == 0); // index getter
+List<Color> colors = Color.values; // list of values
+```
+
+#### Abstract methods, abstract classes
+
+```dart
+abstract class Doer {
+  // ...Define instance variables and methods...
+  void doSomething(); // Define an abstract method.
+}
+```
+
+#### Extending a class
+
+- Pretty standard except reflection related `noSuchMethod()`.
+- `@override` annotation.
+
+#### Interfaces
+
+- Interfaces are implicit inside classes. Use `implements` instead of `extends` on a class.
+
+#### Mixins
+
+```dart
+class Maestro extends Person with Musical, Aggressive, Demented { // keyword `with`
+  // ...
+}
+```
+
+To implement a mixin, create a class that extends Object, declares no constructors, and has no calls to `super`.
+
+```dart
+abstract class Musical {
+  bool canPlayPiano = false;
+  bool canCompose = false;
+  bool canConduct = false;
+
+  void entertainMe() {
+    if (canPlayPiano) {
+      print('Playing piano');
+    } else if (canConduct) {
+      print('Waving hands');
+    } else {
+      print('Humming to self');
+    }
+  }
+}
+```
+
+## Generics
+
+Optional since type is optional.
+
+```dart
+abstract class Cache<T> {
+  T getByKey(String key);
+  setByKey(String key, T value);
+}
+```
+
+Work with built-in collections:
+
+```dart
+var names = <String>['Seth', 'Kathy', 'Lars'];
+var pages = <String, String>{
+  'index.html': 'Homepage',
+  'robots.txt': 'Hints for web robots',
+  'humans.txt': 'We are people, not machines'
+};
+
+var names = new List<String>();
+names.addAll(['Seth', 'Kathy', 'Lars']);
+var nameSet = new Set<String>.from(names);
+```
+
+`is` check with generics is not reliable in production mode.
+
+## Libraries and visibility
+
+#### Importing
+
+```dart
+import 'dart:html'; // built-in starts with `dart:`
+import 'package:mylib/mylib.dart' as mylib; // URI
+
+// partial import
+import 'package:lib1/lib1.dart' show foo;
+import 'package:lib2/lib2.dart' hide foo;
+```
+
+#### Deferred (lazy) loading
+
+```dart
+import 'package:deferred/hello.dart' deferred as hello;
+```
+
+#### Implementing libraries
+
+```dart
+// Declare that this is a library named ballgame.
+library ballgame;
+
+part 'ball.dart'; // part of implmentation is in ball.dart
+part 'util.dart'; // part of implmentation is in util.dart
+```
+
+```dart
+// In `ball.dart`:
+part of ballgame; // this file is part of ballgame library
+```
+
+#### Re-exporting:
+
+```dart
+import 'french.dart';
+export 'french.dart' show hello;
+```
+
+## Asynchrony support
+
+- `await` suspend a function until function call returns. So it must be in a `async` function.
+- `Future<T>` API.
+
+## Isolates
+
+- Like threads but share data only through ports.
+- Does use multiple cores on Dart VM.
+- Converted to web workers in JS.
+
+## Typedefs
+
+Actually *function-type alias*.
+
+Official note: *Currently, typedefs are restricted to function types. We expect this to change.*
+
+```dart
+typedef int Compare(Object a, Object b);
+
+class SortedCollection {
+    Compare compare;
+    SortedCollection(this.compare);
+}
+```
+
+## Metadata
+
+- `@deprecated`
+- `@override`
+- `@proxy` // used when using `noSuchMethod()` to implement every setter, getter and method for a class
+
+## Comments
+
+- Documentation comment lines start with `///`.
+
+</xmp>
+</html>
