@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trie Implementations</title>
+    <meta name="description" content="Three Fine Days - Lingfeng Xu (stakira) - Blog">
+    <script type="text/javascript" src="../js/l.min.js">ljs.load('../js/blog.js');</script>
+</head>
+<xmp style="display:none;">
+# Trie Implementations
+
+The name trie comes from its use for re**trie**val. It is pronounced like "try" by some, like "tree" (the pronunciation of "trie" in "retrieval") by others. It is also called a prefix tree.
+
+So, I expect you already roughly know what is a trie. A trie not only can be used for string loop up, but also could be used to store values associated to string keys. Just like a `set` vs a `map`.
+
+The advantage of trie is, the cost of lookup is `O(m)`, where `m` is the length of keys. In other word, **it's performance is independent of collection size**.
+
+### Array of child pointers
+
+```none
+“tree, “trie”, “algo”, “all”, and “also”
+     .
+    / \
+   /   \
+  a     t
+  |     |
+  l     r
+ /|\   / \
+g l s e   i
+|   | |   |
+o   o e   e
+```
+
+This is the most straight forward implementation of trie.
+
+```java
+class TrieNode {
+    TrieNode[] children = new TrieNode[128]; // for ASCII charset
+    boolean wordends = false;
+    public TrieNode() {}
+}
+
+public class Trie {
+    private TrieNode root;
+
+    public Trie() {
+        root = new TrieNode();
+    }
+
+    public void insert(String word) {
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            int key = word.charAt(i);
+            if (curr.children[key] == null)
+                curr.children[key] = new TrieNode();
+            curr = curr.children[key];
+        }
+        curr.wordends = true;
+    }
+
+    public boolean search(String word) {
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            int key = word.charAt(i);
+            if (curr.children[key] == null)
+                return false;
+            curr = curr.children[key];
+        }
+        return curr.wordends;
+    }
+}
+```
+
+The first observation would be the 128-length array is somewhat wasteful. Given our natural languages, a lot of sequences are not valid, which lead to low utilization no matter how heavy use it is. If we use only a-z, we could shrink to a 26-length array, but not likely less. We are also out of luck if we need to support utf-8, unicode, etc. So another choice is using a HashMap.
+
+```java
+class TrieNode {
+    Map<Character, TrieNode> map = new HashMap<>();
+    boolean wordends = false;
+    public TrieNode() {}
+}
+```
+
+Again `HashMap` is a pretty heavy data structure. There are more compact implementations.
+
+### Linked list
+
+```none
+“tree, “trie”, “algo”, “all”, and “also”
+.
+|
+a--------->t
+|          |
+l          r
+|          |
+g-->l-->s  e-->i
+|       |  |   |
+o       o  e   e
+```
+
+Instead of using an array or a hash map to store children, this implementation store children as a linked list. This kind of tree is called <a href="https://en.wikipedia.org/wiki/Left-child_right-sibling_binary_tree" target="_blank">doubly chained tree</a>. It's compact in space but sacrifices traversal speed.
+
+```java
+class TrieNode {
+    char tag = 0;
+    TrieNode next = null, children = null;
+    boolean wordends = false;
+    public TrieNode() {}
+    public TrieNode(char _tag) { tag = _tag; }
+}
+
+public class Trie {
+    private TrieNode root;
+
+    public Trie() {
+        root = new TrieNode();
+    }
+
+    public void insert(String word) {
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            if (curr.children == null)
+                curr.children = new TrieNode(word.charAt(i));
+            curr = curr.children;
+            while (curr.tag != word.charAt(i)) {
+                if (curr.next == null)
+                    curr.next = new TrieNode(word.charAt(i));
+                curr = curr.next;
+            }
+        }
+        curr.wordends = true;
+    }
+
+    public boolean search(String word) {
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            if (curr.children == null)
+                return false;
+            curr = curr.children;
+            while (curr.tag != word.charAt(i)) {
+                if (curr.next == null)
+                    return false;
+                curr = curr.next;
+            }
+        }
+        return curr.wordends;
+    }
+}
+```
+
+<a href="https://www.cs.bu.edu/teaching/c/tree/trie/" target="_blank">Reference</a>
+
+### Ternary search tree
+
+A ternary search tree is like a BST, except each node has three children. These three children are called `equal kid`, `lo kid` and `hi kid`. Each node also stores a character it is representing. While searching a string, we compare the current character to the character of node. If smaller, we move to `lo kid`. If larger, we move to `hi kid`. Otherwise we move to `equal kid`, and start to search for the next character in string.
+
+```none
+“tree, “trie”, “algo”, “all”, and “also”
+      .
+      |
+      t
+    / |
+   /  |
+  a   r
+  |   |
+  l   e
+  |   |\
+  l   e i
+ / \    |
+g   s   e
+|   |
+o   o
+```
+
+We can see the ternary search tree as a hybrid of trie and BST. The `equal kid` is a real child node in the same meaning of a trie, while `hi kid` and `lo kid` are not. While moving to `hi kid` or `lo kid`, we are searching the current character in a BST. While moving to `equal kid`, we are actually moving to another binary earch tree for the next character in string.
+
+```java
+class TrieNode {
+    char tag = 0;
+    TrieNode lo = null, eq = null, hi = null;
+    boolean wordends = false;
+    public TrieNode() {}
+    public TrieNode(char t) { tag = t; }
+}
+
+public class Trie {
+    private TrieNode root;
+
+    public Trie() {
+        root = new TrieNode();
+    }
+
+    public void insert(String word) {
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            if (curr.eq == null)
+                curr.eq = new TrieNode(word.charAt(i));
+            curr = curr.eq;
+            while (word.charAt(i) != curr.tag) {
+                if (word.charAt(i) > curr.tag) {
+                    if (curr.hi == null)
+                        curr.hi = new TrieNode(word.charAt(i));
+                    curr = curr.hi;
+                } else {
+                    if (curr.lo == null)
+                        curr.lo = new TrieNode(word.charAt(i));
+                    curr = curr.lo;
+                }
+            }
+        }
+        curr.wordends = true;
+    }
+
+    public boolean search(String word) {
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            if (curr.eq == null)
+                return false;
+            curr = curr.eq;
+            while (word.charAt(i) != curr.tag) {
+                if (word.charAt(i) > curr.tag) {
+                    if (curr.hi == null)
+                        return false;
+                    curr = curr.hi;
+                } else {
+                    if (curr.lo == null)
+                        return false;
+                    curr = curr.lo;
+                }
+            }
+        }
+        return curr.wordends;
+    }
+}
+```
+
+Ternary search tree is more compact. No memory is wasted. However operations could be slower. Like a BST, ternary search tree preformance is affected by how balanced the tree is. A balanced ternary search tree should be faster than a linked list based trie.
+
+### Bitwise trie
+
+Bitwise trie is a binary tree using single bit keys, instead of character keys, for children. It's very cache-local and friendly to out-of-order CPUs, therefore very fast.
+
+Some reading: <a href="http://web.stanford.edu/class/cs166/lectures/15/Small15.pdf" target="_blank">x-Fast and y-Fast Tries</a>
+
+### Usages of trie
+
+Auto complete, type checking and correction, Levenshtein distance.
+
+[read](http://stackoverflow.com/questions/10684646/looking-for-a-good-introduction-on-trie/10685469#comment13868291_10685469)
+
+</xmp>
+</html>
