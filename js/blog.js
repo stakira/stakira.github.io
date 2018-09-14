@@ -28,7 +28,7 @@ function loadPage() {
 		node.setAttribute("class", "footer")
 		node.innerHTML =
 			'<div class="container">' +
-			'\t<p class="text-muted">&copy 2015 Three Fine Days. All rights reserved</p>' +
+			'\t<p class="text-muted">&copy 2018 Three Fine Days. All rights reserved</p>' +
 			'</div>';
 		document.body.appendChild(node);
 	}
